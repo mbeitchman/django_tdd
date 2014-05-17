@@ -33,12 +33,13 @@ class NewVisitorTest(unittest.TestCase):
 
 		# He hits enter. The page updates and now the page lists:
 		# "1. Buy guitar strings" as an item on the todo list.
-		input_text_box.send_keys(keys.Enter)
+		input_text_box.send_keys(Keys.ENTER)
 
 		table = self.browser.find_element_by_id('id_list_table')
 		rows = table.find_elements_by_tag_name('tr')
 		self.assertTrue(
-			any(row.text == '1: Buy Guitar Strings' for row in rows)
+			any(row.text == '1: Buy Guitar Strings' for row in rows),
+			"New to-do item is not in the table"
 		)
 
 		# The page shows a text box to enter another item.
