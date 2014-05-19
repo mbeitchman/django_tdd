@@ -33,23 +33,25 @@ class NewVisitorTest(unittest.TestCase):
 				'Enter a to-do item'
 		)
 
-		# He types "buy guitar strings" into a text box.
+		# He types "buy guitar strings" into a text box and hits enter.
 		input_text_box.send_keys("Buy Guitar Strings")
-
-		# He hits enter. The page updates and now the page lists:
-		# "1. Buy guitar strings" as an item on the todo list.
 		input_text_box.send_keys(Keys.ENTER)
 
+		# The page updates and now the page lists:
+		# "1. Buy guitar strings" as an item on the todo list.
 		self.check_for_row_in_list_table('1: Buy Guitar Strings')
 
 		# The page shows a text box to enter another item.
 		# He adds the item "change strings on the guitar"
+		input_text_box = self.browser.find_element_by_id('id_new_item')
+		input_text_box.send_keys("change strings on the guitar")
+		input_text_box.send_keys(Keys.ENTER)
+
+		# The page updates again and shows both items in the todo list.
 		self.check_for_row_in_list_table('1: Buy Guitar Strings')
 		self.check_for_row_in_list_table('2: change strings on the guitar')
 
 		self.fail("Finish the test!")
-
-		# The page updates again and shows both items in the todo list.
 
 		# He wonders if the page will save his todo list when he closes the site.
 		# Then he sees the text explaining that there is a unqiue URL that
