@@ -37,6 +37,8 @@ class NewVisitorTest(LiveServerTestCase):
 		# He types "buy guitar strings" into a text box and hits enter.
 		input_text_box.send_keys("Buy Guitar Strings")
 		input_text_box.send_keys(Keys.ENTER)
+		jonas_list_url = self.browser.current_url
+		self.assertRegex(jonas_list_url, '/lists/.+')
 
 		# The page updates and now the page lists:
 		# "1. Buy guitar strings" as an item on the todo list.
@@ -52,12 +54,32 @@ class NewVisitorTest(LiveServerTestCase):
 		self.check_for_row_in_list_table('1: Buy Guitar Strings')
 		self.check_for_row_in_list_table('2: change strings on the guitar')
 
-		self.fail("Finish the test!")
+		# Now a new user, Francis, comes to the site.
 
-		# He wonders if the page will save his todo list when he closes the site.
-		# Then he sees the text explaining that there is a unqiue URL that
-		# he can use to access the todo list.
+		## use a new browser session to make sure that no info
+		## from edith is present in cookies
+		self.browser.quit()
+		self.browser = webdriver.Firefox()
 
-		# He visits the URL and sees the todo list is still there.
+		# Francis visits the site and there is no sign of Jonas' list
+		self.browser.get(self.live_server_url)
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('Buy Guitar Strings', page_text)
+		self.assertNotIn('change strings on the guitar', page_text)
 
-		# He is satisfied and closes the browser for now.
+		# Francis starts a new list by entering a new item.
+		input_text_box = self.browser.find_element_by_id('id_new_item')
+		input_text_box.send_keys('Buy Milk')
+		input_text_box.send_keys(keys.ENTER)
+
+		# Francis gets his own unique URL
+		francis_list_url = self.browser.current_url
+		self.assertRegex(francis_list_url, '/lists/.+')
+		self.assertNotEqual(francis_list_url, jonas_list_url)
+
+		# again there is no trace of Jonas' list
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('Buy Guitar Strings', page_text)
+		self.assertIn('Buy Milk', page_text)
+
+		# satisfied, they both go back to sleep
